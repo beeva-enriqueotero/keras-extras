@@ -9,13 +9,6 @@ from __future__ import print_function
 import numpy as np
 np.random.seed(1337)  # for reproducibility
 
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
-from keras.utils import np_utils
-from keras import backend as K
-
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--extras', help='(absolute) path to keras-extras')
@@ -23,15 +16,28 @@ parser.add_argument('--gpus', help='number of GPUs')
 parser.print_help()
 args = parser.parse_args()
 
+
+ngpus = int(args.gpus)
+print("Using %i GPUs" %ngpus)
+
+if ngpus == 0:
+	import os
+	os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+	os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Convolution2D, MaxPooling2D
+from keras.utils import np_utils
+from keras import backend as K
+
 import sys
 sys.path.append(args.extras)
 
 from utils.multi_gpu import make_parallel
 
-ngpus = int(args.gpus)
-print("Using %i GPUs" %ngpus)
-
-batch_size = 128
+batch_size = 1024
 nb_classes = 10
 nb_epoch = 12
 
